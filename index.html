@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breakup Form</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>💔 The Breakup Form</h1>
+        <p class="subtitle">Please fill this out carefully...</p>
+        
+        <div class="question-box">
+            <h2 id="question-text">Are you sure?</h2>
+        </div>
+
+        <div class="buttons">
+            <button class="btn yes" id="yesBtn">Yes, I'm sure</button>
+            <button class="btn no" id="noBtn">No, I'll stay</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            "Are you absolutely sure you want to do this?",
+            "Think about all the good times... are you willing to lose that?",
+            "What if I promised to buy you your favorite food?",
+            "Is there really no chance for a second date?",
+            "Final Question: Will you please forgive me and stay?" // The script flips the logic for this one!
+        ];
+
+        let currentQuestionIndex = 0;
+        const questionText = document.getElementById('question-text');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const container = document.querySelector('.container');
+
+        // Initialize
+        questionText.textContent = questions[0];
+
+        // LOGIC FOR "YES" BUTTON (The "I want to leave" button)
+        yesBtn.addEventListener('click', () => {
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < questions.length) {
+                // Show next question
+                questionText.textContent = questions[currentQuestionIndex];
+                
+                // If it's the LAST question, we swap the buttons!
+                // We want her to say "Yes" to "Will you stay?", so "No" becomes the enemy.
+                if (currentQuestionIndex === questions.length - 1) {
+                    yesBtn.textContent = "Yes, I forgive you"; // Good option
+                    noBtn.textContent = "No, bye"; // Bad option (Runaway)
+                    yesBtn.style.backgroundColor = "#ff4b6e"; // Make Yes the 'love' color
+                    noBtn.style.backgroundColor = "#555"; 
+                    
+                    // Reset button behaviors for the final flip
+                    setupFinalTrick();
+                }
+            } else {
+                // This shouldn't happen usually due to the trick, but just in case:
+                success();
+            }
+        });
+
+        // LOGIC FOR "NO" BUTTON (The "I want to stay" button - initially)
+        noBtn.addEventListener('click', () => {
+            if (currentQuestionIndex !== questions.length - 1) {
+                success(); // Early questions: No means "I stay" -> Success!
+            }
+        });
+
+        function setupFinalTrick() {
+            // Remove old listeners (simplest way is to clone or handle inside logic, 
+            // but here we just override the behavior via the runaway function)
+            
+            noBtn.addEventListener('mouseover', moveButton);
+            noBtn.addEventListener('click', moveButton);
+            
+            yesBtn.addEventListener('click', success); // Clicking Yes on the last slide = Success
+        }
+
+        function moveButton(e) {
+            e.preventDefault();
+            // Use Fixed position so it never leaves the visible screen
+            noBtn.style.position = 'fixed'; 
+            
+            // Calculate safe area (padding of 20px from edges)
+            const maxX = window.innerWidth - noBtn.offsetWidth - 20;
+            const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+            
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+
+            noBtn.style.left = Math.max(20, randomX) + 'px';
+            noBtn.style.top = Math.max(20, randomY) + 'px';
+        }
+
+        function success() {
+            container.innerHTML = `
+                <h1>I knew you loved me! ❤️</h1>
+                <p>Date night is on me.</p>
+                <div class="heart">💖</div>
+            `;
+            // Add some confetti effect here if you want
+        }
+    </script>
+</body>
+</html>
